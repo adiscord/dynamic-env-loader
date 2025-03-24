@@ -1,0 +1,22 @@
+{
+  "name": "dynamic-env-loader",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "build": "webpack"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.26.9",
+    "webpack": "^5.98.0",
+    "babel-loader": "^10.0.0",
+    "webpack-cli": "^6.0.1"
+  }
+}
