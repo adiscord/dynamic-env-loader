@@ -3,13 +3,15 @@ const { join } = require("path");
 
 const dotenv = require("dotenv");
 
-dotenv.config();
-dotenv.config({ path: ".env.local" });
-dotenv.config({ path: ".env.development" });
-dotenv.config({ path: ".env.production" });
+const scriptArguments = getScriptArguments();
+const { envDirectory, outputDirectory, outputFileName, envLookupPrefix } =
+  scriptArguments;
 
-const { targetDirectory, targetFileName, lookupPrefix } = getScriptArguments();
-const clientSideVariables = readEnvsWithPrefix(lookupPrefix);
+console.log("Script Arguments: \n", JSON.stringify(scriptArguments, null, 4));
+
+dotenv.config({ path: envDirectory + ".env.local" });
+
+const clientSideVariables = readEnvsWithPrefix(envLookupPrefix);
 const clientSideVariablesJSON = JSON.stringify(clientSideVariables);
 
 try {
@@ -21,17 +23,19 @@ try {
 
 createFile(
   `// eslint-disable-next-line no-undef\nglobalThis.runtimeEnv = JSON.parse('${clientSideVariablesJSON}');`,
-  targetDirectory,
-  targetFileName
+  outputDirectory,
+  outputFileName
 );
 
 // utils
 function getScriptArguments() {
   const args = process.argv.slice(3);
+
   return {
-    targetDirectory: args.length > 0 ? args[0] : "./public/files",
-    targetFileName: args.length > 1 ? args[1] : "csrDynamicEnv.js",
-    lookupPrefix: args.length > 2 ? args[2] : "CSR_DYNAMIC_",
+    envDirectory: args.length > 0 ? args[0] : "./",
+    outputDirectory: args.length > 1 ? args[1] : "./",
+    outputFileName: args.length > 2 ? args[2] : "runtimeEnv.js",
+    envLookupPrefix: args.length > 3 ? args[3] : "RUNTIME_",
   };
 }
 
