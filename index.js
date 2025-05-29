@@ -1,5 +1,5 @@
 const { writeFileSync, existsSync } = require("fs");
-const { join } = require("path");
+const { join, resolve } = require("path");
 
 const dotenv = require("dotenv");
 
@@ -9,7 +9,7 @@ const { envDirectory, outputDirectory, outputFileName, envLookupPrefix } =
 
 console.log("Script Arguments: \n", JSON.stringify(scriptArguments, null, 4));
 
-dotenv.config({ path: envDirectory + ".env.local" });
+dotenv.config({ path: join(envDirectory, ".env.local") });
 
 const clientSideVariables = readEnvsWithPrefix(envLookupPrefix);
 const clientSideVariablesJSON = JSON.stringify(clientSideVariables);
@@ -32,8 +32,8 @@ function getScriptArguments() {
   const args = process.argv.slice(3);
 
   return {
-    envDirectory: args.length > 0 ? args[0] : "./",
-    outputDirectory: args.length > 1 ? args[1] : "./",
+    envDirectory: resolve(args.length > 0 ? args[0] : "./"),
+    outputDirectory: resolve(args.length > 1 ? args[1] : "./"),
     outputFileName: args.length > 2 ? args[2] : "runtimeEnv.js",
     envLookupPrefix: args.length > 3 ? args[3] : "RUNTIME_",
   };
@@ -46,12 +46,12 @@ function readEnvsWithPrefix(prefix) {
 }
 
 function createFile(content, dirName, fileName) {
-  const outputDir = join(process.cwd(), dirName);
-  const outputFile = join(outputDir, fileName);
+  const outputFile = join(dirName, fileName);
 
-  if (!safeExistsSync(outputDir)) {
-    const error = `Output directory "${outputDir}" does not exist`;
-    throw new Error(error);
+  if (!safeExistsSync(dirName)) {
+    const error = `Output directory "${dirName}" does not exist`;
+    console.error(error);
+    return;
   }
 
   writeFileSync(outputFile, content);
